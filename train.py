@@ -7,7 +7,7 @@ import scipy.io as spio
 import numpy as np
 import os
 
-from mat_loader import mat_loader
+from mat_loader import get_data_from_file, download_elipse_dataset
 
 ####################################################
 ####                 FUNCTIONS                   ###
@@ -42,8 +42,11 @@ truth_channels = 1
 #mat_loader.load_from_net(DS='elips')
 
 #-- Training Data --#
-data_train, label_train = mat_loader.get_data(mat_file='data/train_elips.mat')
-data_test, label_test = mat_loader.get_data(mat_file='data/test_elips.mat')
+train_data_path = 'data/train_elips.mat'
+test_data_path = 'data/test_elips.mat'
+download_elipse_dataset(train_data_path, test_data_path)
+data_train, label_train = get_data_from_file(mat_file=train_data_path)
+data_test, label_test = get_data_from_file(mat_file=test_data_path)
 
 #data_channels = 1#data.shape[2]
 #data = preprocess(data, data_channels)    # 4 dimension -> 3 dimension if you do data[:,:,:,1]
@@ -89,8 +92,8 @@ net = Unet_bn(img_channels=data_channels, truth_channels=truth_channels, cost="m
 ####################################################
 
 # args for training
-batch_size = 24  # batch size for training
-valid_size = 24  # batch size for validating
+batch_size = 3  # batch size for training
+valid_size = 3  # batch size for validating
 optimizer = "adam"  # optimizer we want to use, 'adam' or 'momentum'
 
 # output paths for results
@@ -105,7 +108,7 @@ opt_kwargs = {
 
 # make a trainer for scadec
 trainer = Trainer_bn(net, batch_size=batch_size, optimizer = "adam", opt_kwargs=opt_kwargs)
-path = trainer.train(data_provider, output_path, valid_provider, valid_size, training_iters=100, epochs=1000, display_step=20, save_epoch=100, prediction_path=prediction_path)
+path = trainer.train(data_provider, output_path, valid_provider, valid_size, training_iters=100, epochs=1000, display_step=2, save_epoch=100, prediction_path=prediction_path)
 
 print (path)
 
